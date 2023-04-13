@@ -1,4 +1,4 @@
-name: 'Serverless with Python Requirements'
+name: 'Serverless with Python Requirements - Only Changed Functions'
 description: 'Javascript action that runs a Serverless deploy using the serverless-python-requirements plugin.'
 
 runs:
