@@ -25,19 +25,40 @@ async function runServerlessDeploy() {
   // 
   const path = 'services-hashing.json'
 
+  /*
+    {
+      "update_all" : false,
+      "services" : [
+        "place",
+        "manage_cart"
+      ]
+    }
+  */
   let content = await fs.readFile(path, 'utf8')
-  var m = JSON.parse(content);
-  
-  console.log("services-hashing.json " , m);
+  var config = JSON.parse(content);
+  console.log("services-hashing.json " , config);
 
+    if (config.update_all == true){
+      await exeq(
+        `echo Running sls deploy...`,
+        `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
+          sls config credentials --provider aws --key ${process.env.AWS_ACCESS_KEY_ID} --secret ${process.env.AWS_SECRET_ACCESS_KEY} --verbose
+        fi`,
+        `sls deploy --verbose`
+      )
+    }else{
 
-  await exeq(
-    `echo Running sls deploy...`,
-    `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
-      sls config credentials --provider aws --key ${process.env.AWS_ACCESS_KEY_ID} --secret ${process.env.AWS_SECRET_ACCESS_KEY} --verbose
-    fi`,
-    `sls deploy --verbose`
-  )
+      config.services.forEach( async (service) => { 
+        await exeq(
+          `echo Running sls deploy...`,
+          `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
+            sls config credentials --provider aws --key ${process.env.AWS_ACCESS_KEY_ID} --secret ${process.env.AWS_SECRET_ACCESS_KEY} --verbose
+          fi`,
+          `sls deploy function -f ${service} --verbose`
+        )
+      });
+    }
+
 }
 
 //  Runs all functions sequentially
