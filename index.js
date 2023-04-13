@@ -3,6 +3,8 @@ var core = require('@actions/core')
 var execSync = require('child_process').execSync
 code = execSync('npm install exeq --save')
 var exeq = require('exeq')
+const { promises: fs } = require('fs')
+
 
 //  Input variables
 var CANARY_DEPLOYMENTS = core.getInput('canary-deployments')
@@ -20,6 +22,15 @@ async function installServerlessAndPlugins() {
 
 //  Runs Serverless deploy using AWS Credentials if specified, else SERVERLESS ACCESS KEY
 async function runServerlessDeploy() {
+  // 
+  const path = 'services-hashing.json'
+
+  let content = await fs.readFile(path, 'utf8')
+  var m = JSON.parse(content);
+  
+  console.log("services-hashing.json " , m);
+
+
   await exeq(
     `echo Running sls deploy...`,
     `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
