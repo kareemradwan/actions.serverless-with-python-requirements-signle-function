@@ -47,7 +47,7 @@ async function runServerlessDeploy() {
         `sls deploy --verbose`
       )
     }else{
-
+       await exeq(`sls package`) 
       config.services.forEach( async (service) => { 
         await exeq(
           `echo Running sls deploy...`,
