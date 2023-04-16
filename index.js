@@ -34,11 +34,12 @@ async function runServerlessDeploy() {
       ]
     }
   */
-  let content = await fs.readFile(path, 'utf8')
-  var config = JSON.parse(content);
-  console.log("services-hashing.json " , config);
+  try {
 
-    if (config.update_all == true){
+    let content = fs.readFileSync(path, 'utf8')
+    var config = JSON.parse(content);
+
+    if (config.update_all == true) {
       await exeq(
         `echo Running sls deploy...`,
         `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
@@ -46,9 +47,9 @@ async function runServerlessDeploy() {
         fi`,
         `sls deploy --verbose`
       )
-    }else{
-       await exeq(`sls package`) 
-      config.services.forEach( async (service) => { 
+    } else {
+      await exeq(`sls package`)
+      config.services.forEach(async (service) => {
         await exeq(
           `echo Running sls deploy...`,
           `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
@@ -58,6 +59,19 @@ async function runServerlessDeploy() {
         )
       });
     }
+
+  } catch (err) {
+
+    await exeq(
+      `echo Running sls deploy...`,
+      `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
+        sls config credentials --provider aws --key ${process.env.AWS_ACCESS_KEY_ID} --secret ${process.env.AWS_SECRET_ACCESS_KEY} --verbose
+      fi`,
+      `sls deploy --verbose`
+    )
+
+  }
+
 
 }
 
