@@ -35,8 +35,8 @@ async function runServerlessDeploy() {
     }
   */
   try {
-
-    let content = fs.readFileSync(path, 'utf8')
+    let content = await fs.readFile(path, 'utf8')
+//     let content = fs.readFileSync(path, 'utf8')
     var config = JSON.parse(content);
 
     if (config.update_all == true) {
