@@ -61,7 +61,7 @@ async function runServerlessDeploy() {
     }
 
   } catch (err) {
-
+    console.log("Kareem Error " , err );
     await exeq(
       `echo Running sls deploy...`,
       `if [ ${process.env.AWS_ACCESS_KEY_ID} ] && [ ${process.env.AWS_SECRET_ACCESS_KEY} ]; then
@@ -69,6 +69,8 @@ async function runServerlessDeploy() {
       fi`,
       `sls deploy --verbose`
     )
+    
+    console.log("Kareem Error " , err );
 
   }
 
